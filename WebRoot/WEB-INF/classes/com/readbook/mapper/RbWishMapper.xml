@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbWishMapper" >
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_wish where has_check = #{type}
+	</select>
+	<select id="getWishBookName" resultType="string">
+		select book_name from rb_wish where wish_id = #{wishId}
+	</select>
+	<!-- 获取所有愿望书单 -->
+	<select id="getWishList" resultMap="BaseResultMap">
+		select * from rb_wish where has_check = #{0} limit #{1},#{2}
+	</select>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbWish" >
+    <id column="wish_id" property="wishId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="book_name" property="bookName" jdbcType="VARCHAR" />
+    <result column="pub_house" property="pubHouse" jdbcType="VARCHAR" />
+    <result column="wish_detail" property="wishDetail" jdbcType="VARCHAR" />
+    <result column="has_check" property="hasCheck" jdbcType="INTEGER" />
+    <result column="wish_date" property="wishDate" jdbcType="TIMESTAMP" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    wish_id, user_id, book_name, pub_house, wish_detail, has_check, wish_date, author
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbWishExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_wish
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from rb_wish
+    where wish_id = #{wishId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_wish
+    where wish_id = #{wishId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbWishExample" >
+    delete from rb_wish
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbWish" >
+    insert into rb_wish (wish_id, user_id, book_name, 
+      pub_house, wish_detail, has_check, 
+      wish_date, author)
+    values (#{wishId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{bookName,jdbcType=VARCHAR}, 
+      #{pubHouse,jdbcType=VARCHAR}, #{wishDetail,jdbcType=VARCHAR}, #{hasCheck,jdbcType=INTEGER}, 
+      #{wishDate,jdbcType=TIMESTAMP}, #{author,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbWish" >
+    insert into rb_wish
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="wishId != null" >
+        wish_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="bookName != null" >
+        book_name,
+      </if>
+      <if test="pubHouse != null" >
+        pub_house,
+      </if>
+      <if test="wishDetail != null" >
+        wish_detail,
+      </if>
+      <if test="hasCheck != null" >
+        has_check,
+      </if>
+      <if test="wishDate != null" >
+        wish_date,
+      </if>
+      <if test="author != null" >
+        author,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="wishId != null" >
+        #{wishId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookName != null" >
+        #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="wishDetail != null" >
+        #{wishDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="hasCheck != null" >
+        #{hasCheck,jdbcType=INTEGER},
+      </if>
+      <if test="wishDate != null" >
+        #{wishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbWishExample" resultType="java.lang.Integer" >
+    select count(*) from rb_wish
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_wish
+    <set >
+      <if test="record.wishId != null" >
+        wish_id = #{record.wishId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bookName != null" >
+        book_name = #{record.bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pubHouse != null" >
+        pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wishDetail != null" >
+        wish_detail = #{record.wishDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hasCheck != null" >
+        has_check = #{record.hasCheck,jdbcType=INTEGER},
+      </if>
+      <if test="record.wishDate != null" >
+        wish_date = #{record.wishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.author != null" >
+        author = #{record.author,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_wish
+    set wish_id = #{record.wishId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      book_name = #{record.bookName,jdbcType=VARCHAR},
+      pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      wish_detail = #{record.wishDetail,jdbcType=VARCHAR},
+      has_check = #{record.hasCheck,jdbcType=INTEGER},
+      wish_date = #{record.wishDate,jdbcType=TIMESTAMP},
+      author = #{record.author,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbWish" >
+    update rb_wish
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookName != null" >
+        book_name = #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        pub_house = #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="wishDetail != null" >
+        wish_detail = #{wishDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="hasCheck != null" >
+        has_check = #{hasCheck,jdbcType=INTEGER},
+      </if>
+      <if test="wishDate != null" >
+        wish_date = #{wishDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="author != null" >
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where wish_id = #{wishId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbWish" >
+    update rb_wish
+    set user_id = #{userId,jdbcType=VARCHAR},
+      book_name = #{bookName,jdbcType=VARCHAR},
+      pub_house = #{pubHouse,jdbcType=VARCHAR},
+      wish_detail = #{wishDetail,jdbcType=VARCHAR},
+      has_check = #{hasCheck,jdbcType=INTEGER},
+      wish_date = #{wishDate,jdbcType=TIMESTAMP},
+      author = #{author,jdbcType=VARCHAR}
+    where wish_id = #{wishId,jdbcType=INTEGER}
+  </update>
+</mapper>

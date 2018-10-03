@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="ReadBook"
+  id="myeclipse.1520598572798"
+  context-root="/"
+  j2ee-spec="5.0"
+  archive="ReadBook.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

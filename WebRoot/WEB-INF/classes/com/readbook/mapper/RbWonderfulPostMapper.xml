@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbWonderfulPostMapper" >
+	<!-- 获取精彩书评 -->
+	<select id="getWonderfulPostList" resultMap="ResultMapWithBLOBs">
+		select * from rb_wonderful_post limit #{0},#{1}
+	</select>
+	
+	<!-- 获取精彩书评总数 -->
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_wonderful_post
+	</select>
+	<select id="getWonderfulPost" resultType="com.readbook.pojo.RbWonderfulPost">
+		select wonderful_post_id as wonderfulPostId,post_book_name as postBookName,
+		post_time as postTime,post_author as postAuthor,post_content as postContent from rb_wonderful_post limit #{0},#{1}
+	</select>
+
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbWonderfulPost" >
+    <id column="wonderful_post_id" property="wonderfulPostId" jdbcType="INTEGER" />
+    <result column="post_book_name" property="postBookName" jdbcType="VARCHAR" />
+    <result column="post_time" property="postTime" jdbcType="TIMESTAMP" />
+    <result column="post_author" property="postAuthor" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbWonderfulPost" extends="BaseResultMap" >
+    <result column="post_content" property="postContent" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    wonderful_post_id, post_book_name, post_time, post_author
+  </sql>
+  <sql id="Blob_Column_List" >
+    post_content
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbWonderfulPostExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_wonderful_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbWonderfulPostExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_wonderful_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_wonderful_post
+    where wonderful_post_id = #{wonderfulPostId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_wonderful_post
+    where wonderful_post_id = #{wonderfulPostId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbWonderfulPostExample" >
+    delete from rb_wonderful_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbWonderfulPost" >
+    insert into rb_wonderful_post (wonderful_post_id, post_book_name, post_time, 
+      post_author, post_content)
+    values (#{wonderfulPostId,jdbcType=INTEGER}, #{postBookName,jdbcType=VARCHAR}, #{postTime,jdbcType=TIMESTAMP}, 
+      #{postAuthor,jdbcType=VARCHAR}, #{postContent,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbWonderfulPost" >
+    insert into rb_wonderful_post
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="wonderfulPostId != null" >
+        wonderful_post_id,
+      </if>
+      <if test="postBookName != null" >
+        post_book_name,
+      </if>
+      <if test="postTime != null" >
+        post_time,
+      </if>
+      <if test="postAuthor != null" >
+        post_author,
+      </if>
+      <if test="postContent != null" >
+        post_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="wonderfulPostId != null" >
+        #{wonderfulPostId,jdbcType=INTEGER},
+      </if>
+      <if test="postBookName != null" >
+        #{postBookName,jdbcType=VARCHAR},
+      </if>
+      <if test="postTime != null" >
+        #{postTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postAuthor != null" >
+        #{postAuthor,jdbcType=VARCHAR},
+      </if>
+      <if test="postContent != null" >
+        #{postContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbWonderfulPostExample" resultType="java.lang.Integer" >
+    select count(*) from rb_wonderful_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_wonderful_post
+    <set >
+      <if test="record.wonderfulPostId != null" >
+        wonderful_post_id = #{record.wonderfulPostId,jdbcType=INTEGER},
+      </if>
+      <if test="record.postBookName != null" >
+        post_book_name = #{record.postBookName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.postTime != null" >
+        post_time = #{record.postTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.postAuthor != null" >
+        post_author = #{record.postAuthor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.postContent != null" >
+        post_content = #{record.postContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_wonderful_post
+    set wonderful_post_id = #{record.wonderfulPostId,jdbcType=INTEGER},
+      post_book_name = #{record.postBookName,jdbcType=VARCHAR},
+      post_time = #{record.postTime,jdbcType=TIMESTAMP},
+      post_author = #{record.postAuthor,jdbcType=VARCHAR},
+      post_content = #{record.postContent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_wonderful_post
+    set wonderful_post_id = #{record.wonderfulPostId,jdbcType=INTEGER},
+      post_book_name = #{record.postBookName,jdbcType=VARCHAR},
+      post_time = #{record.postTime,jdbcType=TIMESTAMP},
+      post_author = #{record.postAuthor,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbWonderfulPost" >
+    update rb_wonderful_post
+    <set >
+      <if test="postBookName != null" >
+        post_book_name = #{postBookName,jdbcType=VARCHAR},
+      </if>
+      <if test="postTime != null" >
+        post_time = #{postTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postAuthor != null" >
+        post_author = #{postAuthor,jdbcType=VARCHAR},
+      </if>
+      <if test="postContent != null" >
+        post_content = #{postContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where wonderful_post_id = #{wonderfulPostId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbWonderfulPost" >
+    update rb_wonderful_post
+    set post_book_name = #{postBookName,jdbcType=VARCHAR},
+      post_time = #{postTime,jdbcType=TIMESTAMP},
+      post_author = #{postAuthor,jdbcType=VARCHAR},
+      post_content = #{postContent,jdbcType=LONGVARCHAR}
+    where wonderful_post_id = #{wonderfulPostId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbWonderfulPost" >
+    update rb_wonderful_post
+    set post_book_name = #{postBookName,jdbcType=VARCHAR},
+      post_time = #{postTime,jdbcType=TIMESTAMP},
+      post_author = #{postAuthor,jdbcType=VARCHAR}
+    where wonderful_post_id = #{wonderfulPostId,jdbcType=INTEGER}
+  </update>
+</mapper>

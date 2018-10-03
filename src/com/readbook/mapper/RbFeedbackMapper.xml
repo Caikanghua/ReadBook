@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbFeedbackMapper" >
+	<!-- 获取反馈数量 -->
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_feedback
+	</select>
+	<!-- 获取反馈列表 -->
+	<select id="getFeedbackList" resultMap="ResultMapWithBLOBs">
+		select * from rb_feedback where has_dealed=0 limit #{0},#{1}
+	</select>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbFeedback" >
+    <id column="feedback_id" property="feedbackId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="proposed_date" property="proposedDate" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="printscreen" property="printscreen" jdbcType="VARCHAR" />
+    <result column="feedback_result" property="feedbackResult" jdbcType="VARCHAR" />
+    <result column="has_dealed" property="hasDealed" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbFeedback" extends="BaseResultMap" >
+    <result column="detail" property="detail" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    feedback_id, user_id, proposed_date, title, printscreen, feedback_result, has_dealed
+  </sql>
+  <sql id="Blob_Column_List" >
+    detail
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbFeedbackExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbFeedbackExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_feedback
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_feedback
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbFeedbackExample" >
+    delete from rb_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbFeedback" >
+    insert into rb_feedback (feedback_id, user_id, proposed_date, 
+      title, printscreen, feedback_result, 
+      has_dealed, detail)
+    values (#{feedbackId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{proposedDate,jdbcType=TIMESTAMP}, 
+      #{title,jdbcType=VARCHAR}, #{printscreen,jdbcType=VARCHAR}, #{feedbackResult,jdbcType=VARCHAR}, 
+      #{hasDealed,jdbcType=INTEGER}, #{detail,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbFeedback" >
+    insert into rb_feedback
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="feedbackId != null" >
+        feedback_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="printscreen != null" >
+        printscreen,
+      </if>
+      <if test="feedbackResult != null" >
+        feedback_result,
+      </if>
+      <if test="hasDealed != null" >
+        has_dealed,
+      </if>
+      <if test="detail != null" >
+        detail,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="feedbackId != null" >
+        #{feedbackId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="printscreen != null" >
+        #{printscreen,jdbcType=VARCHAR},
+      </if>
+      <if test="feedbackResult != null" >
+        #{feedbackResult,jdbcType=VARCHAR},
+      </if>
+      <if test="hasDealed != null" >
+        #{hasDealed,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null" >
+        #{detail,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbFeedbackExample" resultType="java.lang.Integer" >
+    select count(*) from rb_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_feedback
+    <set >
+      <if test="record.feedbackId != null" >
+        feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proposedDate != null" >
+        proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.title != null" >
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.printscreen != null" >
+        printscreen = #{record.printscreen,jdbcType=VARCHAR},
+      </if>
+      <if test="record.feedbackResult != null" >
+        feedback_result = #{record.feedbackResult,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hasDealed != null" >
+        has_dealed = #{record.hasDealed,jdbcType=INTEGER},
+      </if>
+      <if test="record.detail != null" >
+        detail = #{record.detail,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_feedback
+    set feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      printscreen = #{record.printscreen,jdbcType=VARCHAR},
+      feedback_result = #{record.feedbackResult,jdbcType=VARCHAR},
+      has_dealed = #{record.hasDealed,jdbcType=INTEGER},
+      detail = #{record.detail,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_feedback
+    set feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      printscreen = #{record.printscreen,jdbcType=VARCHAR},
+      feedback_result = #{record.feedbackResult,jdbcType=VARCHAR},
+      has_dealed = #{record.hasDealed,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbFeedback" >
+    update rb_feedback
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="printscreen != null" >
+        printscreen = #{printscreen,jdbcType=VARCHAR},
+      </if>
+      <if test="feedbackResult != null" >
+        feedback_result = #{feedbackResult,jdbcType=VARCHAR},
+      </if>
+      <if test="hasDealed != null" >
+        has_dealed = #{hasDealed,jdbcType=INTEGER},
+      </if>
+      <if test="detail != null" >
+        detail = #{detail,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbFeedback" >
+    update rb_feedback
+    set user_id = #{userId,jdbcType=VARCHAR},
+      proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      printscreen = #{printscreen,jdbcType=VARCHAR},
+      feedback_result = #{feedbackResult,jdbcType=VARCHAR},
+      has_dealed = #{hasDealed,jdbcType=INTEGER},
+      detail = #{detail,jdbcType=LONGVARCHAR}
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbFeedback" >
+    update rb_feedback
+    set user_id = #{userId,jdbcType=VARCHAR},
+      proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      printscreen = #{printscreen,jdbcType=VARCHAR},
+      feedback_result = #{feedbackResult,jdbcType=VARCHAR},
+      has_dealed = #{hasDealed,jdbcType=INTEGER}
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbReportMapper" >
+	<!-- 根据isdone获取举报列表总数 -->
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_report where isDone=#{isdone}
+	</select>
+	<!-- 获取举报列表 -->
+	<select id="getReportsByCondition" resultMap="ResultMapWithBLOBs">
+		select * from rb_report where isdone=#{0} limit #{1},#{2}
+	</select>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbReport" >
+    <id column="report_id" property="reportId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="comment_id" property="commentId" jdbcType="VARCHAR" />
+    <result column="proposed_date" property="proposedDate" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="detail" property="detail" jdbcType="VARCHAR" />
+    <result column="isDone" property="isdone" jdbcType="BIT" />
+    <result column="type" property="type" jdbcType="BIT" />
+    <result column="u_comment_id" property="uCommentId" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbReport" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    report_id, user_id, comment_id, proposed_date, title, detail, isDone, type, u_comment_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbReportExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbReportExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_report
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_report
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbReportExample" >
+    delete from rb_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbReport" >
+    insert into rb_report (report_id, user_id, comment_id, 
+      proposed_date, title, detail, 
+      isDone, type, u_comment_id, content
+      )
+    values (#{reportId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{commentId,jdbcType=VARCHAR}, 
+      #{proposedDate,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{detail,jdbcType=VARCHAR}, 
+      #{isdone,jdbcType=BIT}, #{type,jdbcType=BIT}, #{uCommentId,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbReport" >
+    insert into rb_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="reportId != null" >
+        report_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="commentId != null" >
+        comment_id,
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="detail != null" >
+        detail,
+      </if>
+      <if test="isdone != null" >
+        isDone,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="uCommentId != null" >
+        u_comment_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="reportId != null" >
+        #{reportId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="commentId != null" >
+        #{commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null" >
+        #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="isdone != null" >
+        #{isdone,jdbcType=BIT},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=BIT},
+      </if>
+      <if test="uCommentId != null" >
+        #{uCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbReportExample" resultType="java.lang.Integer" >
+    select count(*) from rb_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_report
+    <set >
+      <if test="record.reportId != null" >
+        report_id = #{record.reportId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commentId != null" >
+        comment_id = #{record.commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proposedDate != null" >
+        proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.title != null" >
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.detail != null" >
+        detail = #{record.detail,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isdone != null" >
+        isDone = #{record.isdone,jdbcType=BIT},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=BIT},
+      </if>
+      <if test="record.uCommentId != null" >
+        u_comment_id = #{record.uCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_report
+    set report_id = #{record.reportId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      comment_id = #{record.commentId,jdbcType=VARCHAR},
+      proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      detail = #{record.detail,jdbcType=VARCHAR},
+      isDone = #{record.isdone,jdbcType=BIT},
+      type = #{record.type,jdbcType=BIT},
+      u_comment_id = #{record.uCommentId,jdbcType=VARCHAR},
+      content = #{record.content,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_report
+    set report_id = #{record.reportId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      comment_id = #{record.commentId,jdbcType=VARCHAR},
+      proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      detail = #{record.detail,jdbcType=VARCHAR},
+      isDone = #{record.isdone,jdbcType=BIT},
+      type = #{record.type,jdbcType=BIT},
+      u_comment_id = #{record.uCommentId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbReport" >
+    update rb_report
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="commentId != null" >
+        comment_id = #{commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null" >
+        detail = #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="isdone != null" >
+        isDone = #{isdone,jdbcType=BIT},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=BIT},
+      </if>
+      <if test="uCommentId != null" >
+        u_comment_id = #{uCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbReport" >
+    update rb_report
+    set user_id = #{userId,jdbcType=VARCHAR},
+      comment_id = #{commentId,jdbcType=VARCHAR},
+      proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      detail = #{detail,jdbcType=VARCHAR},
+      isDone = #{isdone,jdbcType=BIT},
+      type = #{type,jdbcType=BIT},
+      u_comment_id = #{uCommentId,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbReport" >
+    update rb_report
+    set user_id = #{userId,jdbcType=VARCHAR},
+      comment_id = #{commentId,jdbcType=VARCHAR},
+      proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      detail = #{detail,jdbcType=VARCHAR},
+      isDone = #{isdone,jdbcType=BIT},
+      type = #{type,jdbcType=BIT},
+      u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+    where report_id = #{reportId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.UserVoteMapper" >
+	<!-- 增加用户投票数 -->
+	<update id="incUserVoteTimes">
+		update user_vote set vote_times =vote_times+1 where user_vote_id=#{userVoteId}
+	</update>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.UserVote" >
+    <id column="user_vote_id" property="userVoteId" jdbcType="VARCHAR" />
+    <result column="vote_times" property="voteTimes" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    user_vote_id, vote_times
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.UserVoteExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from user_vote
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_vote
+    where user_vote_id = #{userVoteId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from user_vote
+    where user_vote_id = #{userVoteId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.UserVoteExample" >
+    delete from user_vote
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.UserVote" >
+    insert into user_vote (user_vote_id, vote_times)
+    values (#{userVoteId,jdbcType=VARCHAR}, #{voteTimes,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.UserVote" >
+    insert into user_vote
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userVoteId != null" >
+        user_vote_id,
+      </if>
+      <if test="voteTimes != null" >
+        vote_times,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userVoteId != null" >
+        #{userVoteId,jdbcType=VARCHAR},
+      </if>
+      <if test="voteTimes != null" >
+        #{voteTimes,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.UserVoteExample" resultType="java.lang.Integer" >
+    select count(*) from user_vote
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update user_vote
+    <set >
+      <if test="record.userVoteId != null" >
+        user_vote_id = #{record.userVoteId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.voteTimes != null" >
+        vote_times = #{record.voteTimes,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update user_vote
+    set user_vote_id = #{record.userVoteId,jdbcType=VARCHAR},
+      vote_times = #{record.voteTimes,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.UserVote" >
+    update user_vote
+    <set >
+      <if test="voteTimes != null" >
+        vote_times = #{voteTimes,jdbcType=INTEGER},
+      </if>
+    </set>
+    where user_vote_id = #{userVoteId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.UserVote" >
+    update user_vote
+    set vote_times = #{voteTimes,jdbcType=INTEGER}
+    where user_vote_id = #{userVoteId,jdbcType=VARCHAR}
+  </update>
+</mapper>

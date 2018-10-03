@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbUsercommentMapper" >
+	<select id="getBeCommenterIdAndName" resultType="com.readbook.pojo.RbUsercomment">
+			select from_id as fromId,from_name as fromName from rb_usercomment where u_comment_id=#{0}
+	</select>
+	 <resultMap id="BaseResultMap" type="com.readbook.pojo.RbUsercomment" >
+    <id column="u_comment_id" property="uCommentId" jdbcType="VARCHAR" />
+    <result column="comment_type" property="commentType" jdbcType="INTEGER" />
+    <result column="from_id" property="fromId" jdbcType="VARCHAR" />
+    <result column="from_name" property="fromName" jdbcType="VARCHAR" />
+    <result column="to_comment_id" property="toCommentId" jdbcType="VARCHAR" />
+    <result column="at_id" property="atId" jdbcType="VARCHAR" />
+    <result column="at_name" property="atName" jdbcType="VARCHAR" />
+    <result column="TIME" property="time" jdbcType="TIMESTAMP" />
+    <result column="comment_id" property="commentId" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbUsercomment" extends="BaseResultMap" >
+    <result column="ucontent" property="ucontent" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    u_comment_id, comment_type, from_id, from_name, to_comment_id, at_id, at_name, TIME, 
+    comment_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    ucontent
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbUsercommentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_usercomment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbUsercommentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_usercomment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_usercomment
+    where u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rb_usercomment
+    where u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbUsercommentExample" >
+    delete from rb_usercomment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbUsercomment" >
+    insert into rb_usercomment (u_comment_id, comment_type, from_id, 
+      from_name, to_comment_id, at_id, 
+      at_name, TIME, comment_id, 
+      ucontent)
+    values (#{uCommentId,jdbcType=VARCHAR}, #{commentType,jdbcType=INTEGER}, #{fromId,jdbcType=VARCHAR}, 
+      #{fromName,jdbcType=VARCHAR}, #{toCommentId,jdbcType=VARCHAR}, #{atId,jdbcType=VARCHAR}, 
+      #{atName,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, #{commentId,jdbcType=VARCHAR}, 
+      #{ucontent,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbUsercomment" >
+    insert into rb_usercomment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uCommentId != null" >
+        u_comment_id,
+      </if>
+      <if test="commentType != null" >
+        comment_type,
+      </if>
+      <if test="fromId != null" >
+        from_id,
+      </if>
+      <if test="fromName != null" >
+        from_name,
+      </if>
+      <if test="toCommentId != null" >
+        to_comment_id,
+      </if>
+      <if test="atId != null" >
+        at_id,
+      </if>
+      <if test="atName != null" >
+        at_name,
+      </if>
+      <if test="time != null" >
+        TIME,
+      </if>
+      <if test="commentId != null" >
+        comment_id,
+      </if>
+      <if test="ucontent != null" >
+        ucontent,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uCommentId != null" >
+        #{uCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="commentType != null" >
+        #{commentType,jdbcType=INTEGER},
+      </if>
+      <if test="fromId != null" >
+        #{fromId,jdbcType=VARCHAR},
+      </if>
+      <if test="fromName != null" >
+        #{fromName,jdbcType=VARCHAR},
+      </if>
+      <if test="toCommentId != null" >
+        #{toCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="atId != null" >
+        #{atId,jdbcType=VARCHAR},
+      </if>
+      <if test="atName != null" >
+        #{atName,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentId != null" >
+        #{commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="ucontent != null" >
+        #{ucontent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbUsercommentExample" resultType="java.lang.Integer" >
+    select count(*) from rb_usercomment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_usercomment
+    <set >
+      <if test="record.uCommentId != null" >
+        u_comment_id = #{record.uCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commentType != null" >
+        comment_type = #{record.commentType,jdbcType=INTEGER},
+      </if>
+      <if test="record.fromId != null" >
+        from_id = #{record.fromId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fromName != null" >
+        from_name = #{record.fromName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.toCommentId != null" >
+        to_comment_id = #{record.toCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atId != null" >
+        at_id = #{record.atId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atName != null" >
+        at_name = #{record.atName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.time != null" >
+        TIME = #{record.time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.commentId != null" >
+        comment_id = #{record.commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ucontent != null" >
+        ucontent = #{record.ucontent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_usercomment
+    set u_comment_id = #{record.uCommentId,jdbcType=VARCHAR},
+      comment_type = #{record.commentType,jdbcType=INTEGER},
+      from_id = #{record.fromId,jdbcType=VARCHAR},
+      from_name = #{record.fromName,jdbcType=VARCHAR},
+      to_comment_id = #{record.toCommentId,jdbcType=VARCHAR},
+      at_id = #{record.atId,jdbcType=VARCHAR},
+      at_name = #{record.atName,jdbcType=VARCHAR},
+      TIME = #{record.time,jdbcType=TIMESTAMP},
+      comment_id = #{record.commentId,jdbcType=VARCHAR},
+      ucontent = #{record.ucontent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_usercomment
+    set u_comment_id = #{record.uCommentId,jdbcType=VARCHAR},
+      comment_type = #{record.commentType,jdbcType=INTEGER},
+      from_id = #{record.fromId,jdbcType=VARCHAR},
+      from_name = #{record.fromName,jdbcType=VARCHAR},
+      to_comment_id = #{record.toCommentId,jdbcType=VARCHAR},
+      at_id = #{record.atId,jdbcType=VARCHAR},
+      at_name = #{record.atName,jdbcType=VARCHAR},
+      TIME = #{record.time,jdbcType=TIMESTAMP},
+      comment_id = #{record.commentId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbUsercomment" >
+    update rb_usercomment
+    <set >
+      <if test="commentType != null" >
+        comment_type = #{commentType,jdbcType=INTEGER},
+      </if>
+      <if test="fromId != null" >
+        from_id = #{fromId,jdbcType=VARCHAR},
+      </if>
+      <if test="fromName != null" >
+        from_name = #{fromName,jdbcType=VARCHAR},
+      </if>
+      <if test="toCommentId != null" >
+        to_comment_id = #{toCommentId,jdbcType=VARCHAR},
+      </if>
+      <if test="atId != null" >
+        at_id = #{atId,jdbcType=VARCHAR},
+      </if>
+      <if test="atName != null" >
+        at_name = #{atName,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        TIME = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentId != null" >
+        comment_id = #{commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="ucontent != null" >
+        ucontent = #{ucontent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbUsercomment" >
+    update rb_usercomment
+    set comment_type = #{commentType,jdbcType=INTEGER},
+      from_id = #{fromId,jdbcType=VARCHAR},
+      from_name = #{fromName,jdbcType=VARCHAR},
+      to_comment_id = #{toCommentId,jdbcType=VARCHAR},
+      at_id = #{atId,jdbcType=VARCHAR},
+      at_name = #{atName,jdbcType=VARCHAR},
+      TIME = #{time,jdbcType=TIMESTAMP},
+      comment_id = #{commentId,jdbcType=VARCHAR},
+      ucontent = #{ucontent,jdbcType=LONGVARCHAR}
+    where u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbUsercomment" >
+    update rb_usercomment
+    set comment_type = #{commentType,jdbcType=INTEGER},
+      from_id = #{fromId,jdbcType=VARCHAR},
+      from_name = #{fromName,jdbcType=VARCHAR},
+      to_comment_id = #{toCommentId,jdbcType=VARCHAR},
+      at_id = #{atId,jdbcType=VARCHAR},
+      at_name = #{atName,jdbcType=VARCHAR},
+      TIME = #{time,jdbcType=TIMESTAMP},
+      comment_id = #{commentId,jdbcType=VARCHAR}
+    where u_comment_id = #{uCommentId,jdbcType=VARCHAR}
+  </update>
+</mapper>

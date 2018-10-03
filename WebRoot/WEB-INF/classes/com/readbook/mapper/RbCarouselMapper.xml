@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbCarouselMapper" >
+	<!-- 更改轮播图为展示 -->
+	<update id="changeToShow">
+		update rb_carousel set is_shown =1 where carousel_id=#{i}
+	</update>
+	<!-- 获取用于展示的轮播图 -->
+  <select id="getCarouselShow" resultType="com.readbook.pojo.RbCarousel">
+  		select carousel_id as carouselId,url,is_shown as isShown,
+  		upload_date as uploadDate,is_delete as isDelete,push_url as pushUrl,description
+  		from rb_carousel where is_shown=1 limit 0,#{number};
+  </select>
+ <resultMap id="BaseResultMap" type="com.readbook.pojo.RbCarousel" >
+    <id column="carousel_id" property="carouselId" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="is_shown" property="isShown" jdbcType="BIT" />
+    <result column="upload_date" property="uploadDate" jdbcType="TIMESTAMP" />
+    <result column="is_delete" property="isDelete" jdbcType="BIT" />
+    <result column="push_url" property="pushUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbCarousel" extends="BaseResultMap" >
+    <result column="description" property="description" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    carousel_id, url, is_shown, upload_date, is_delete, push_url
+  </sql>
+  <sql id="Blob_Column_List" >
+    description
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbCarouselExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_carousel
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbCarouselExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_carousel
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_carousel
+    where carousel_id = #{carouselId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_carousel
+    where carousel_id = #{carouselId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbCarouselExample" >
+    delete from rb_carousel
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbCarousel" >
+    insert into rb_carousel (carousel_id, url, is_shown, 
+      upload_date, is_delete, push_url, 
+      description)
+    values (#{carouselId,jdbcType=INTEGER}, #{url,jdbcType=VARCHAR}, #{isShown,jdbcType=BIT}, 
+      #{uploadDate,jdbcType=TIMESTAMP}, #{isDelete,jdbcType=BIT}, #{pushUrl,jdbcType=VARCHAR}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbCarousel" >
+    insert into rb_carousel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="carouselId != null" >
+        carousel_id,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="isShown != null" >
+        is_shown,
+      </if>
+      <if test="uploadDate != null" >
+        upload_date,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="pushUrl != null" >
+        push_url,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="carouselId != null" >
+        #{carouselId,jdbcType=INTEGER},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="isShown != null" >
+        #{isShown,jdbcType=BIT},
+      </if>
+      <if test="uploadDate != null" >
+        #{uploadDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="pushUrl != null" >
+        #{pushUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbCarouselExample" resultType="java.lang.Integer" >
+    select count(*) from rb_carousel
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_carousel
+    <set >
+      <if test="record.carouselId != null" >
+        carousel_id = #{record.carouselId,jdbcType=INTEGER},
+      </if>
+      <if test="record.url != null" >
+        url = #{record.url,jdbcType=VARCHAR},
+      </if>
+      <if test="record.isShown != null" >
+        is_shown = #{record.isShown,jdbcType=BIT},
+      </if>
+      <if test="record.uploadDate != null" >
+        upload_date = #{record.uploadDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.isDelete != null" >
+        is_delete = #{record.isDelete,jdbcType=BIT},
+      </if>
+      <if test="record.pushUrl != null" >
+        push_url = #{record.pushUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.description != null" >
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_carousel
+    set carousel_id = #{record.carouselId,jdbcType=INTEGER},
+      url = #{record.url,jdbcType=VARCHAR},
+      is_shown = #{record.isShown,jdbcType=BIT},
+      upload_date = #{record.uploadDate,jdbcType=TIMESTAMP},
+      is_delete = #{record.isDelete,jdbcType=BIT},
+      push_url = #{record.pushUrl,jdbcType=VARCHAR},
+      description = #{record.description,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_carousel
+    set carousel_id = #{record.carouselId,jdbcType=INTEGER},
+      url = #{record.url,jdbcType=VARCHAR},
+      is_shown = #{record.isShown,jdbcType=BIT},
+      upload_date = #{record.uploadDate,jdbcType=TIMESTAMP},
+      is_delete = #{record.isDelete,jdbcType=BIT},
+      push_url = #{record.pushUrl,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbCarousel" >
+    update rb_carousel
+    <set >
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="isShown != null" >
+        is_shown = #{isShown,jdbcType=BIT},
+      </if>
+      <if test="uploadDate != null" >
+        upload_date = #{uploadDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="pushUrl != null" >
+        push_url = #{pushUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where carousel_id = #{carouselId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbCarousel" >
+    update rb_carousel
+    set url = #{url,jdbcType=VARCHAR},
+      is_shown = #{isShown,jdbcType=BIT},
+      upload_date = #{uploadDate,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=BIT},
+      push_url = #{pushUrl,jdbcType=VARCHAR},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where carousel_id = #{carouselId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbCarousel" >
+    update rb_carousel
+    set url = #{url,jdbcType=VARCHAR},
+      is_shown = #{isShown,jdbcType=BIT},
+      upload_date = #{uploadDate,jdbcType=TIMESTAMP},
+      is_delete = #{isDelete,jdbcType=BIT},
+      push_url = #{pushUrl,jdbcType=VARCHAR}
+    where carousel_id = #{carouselId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbShareMapper" >
+    <!-- 过期 -->
+	<select id="getShareList" resultType="com.readbook.pojo.RbShare">
+		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,proposed_date AS proposedDate,book_name AS bookName,
+  		author,phone,state,deliever_way AS delieverWay,location FROM rb_share 
+  		WHERE 
+  		<if test="rankby==0">
+  			1=1
+  		</if>
+  		<if test="rankby==1">
+  			state=0
+  		</if>
+  		<if test="rankby==2">
+  			state=1
+  		</if>
+  		<if test="rankby==3">
+  			state=2
+  		</if>
+  		limit #{index},#{count};
+	</select>
+	<!-- 获取分享书所有记录数 -->
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_share where
+		<if test="rankby==0">
+  			1=1;
+  		</if>
+  		<if test="rankby==1">
+  			state=0;
+  		</if>
+  		<if test="rankby==2">
+  			state=1;
+  		</if>
+  		<if test="rankby==3">
+  			state=2;
+  		</if>
+		
+	</select>
+	<!-- 获取用户所有的分享书 -->
+	<select id="getUserAllShares" resultType="com.readbook.pojo.RbShare">
+		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,proposed_date AS proposedDate,book_name AS bookName,
+  		author,phone,state,deliever_way AS delieverWay,location FROM rb_share
+  		where user_id =#{0} limit #{1},#{2}
+	</select>
+	<select id="searhUserShareBook" resultType="com.readbook.pojo.RbShare">
+		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,proposed_date AS proposedDate,book_name AS bookName,
+  		author,phone,state,deliever_way AS delieverWay,pub_house as pubHouse,location FROM rb_share
+  		where state=#{state} order by proposed_date desc limit #{start_num},#{page_size};
+	</select>
+	<select id="getShareByPhone" resultType="com.readbook.pojo.RbShare">
+		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,pub_house as pubHouse,proposed_date AS proposedDate,book_name AS bookName,
+  		author,phone,state,deliever_way AS delieverWay,location FROM rb_share
+  		where phone=#{phone} AND state=3 order by proposed_date desc;
+	</select>
+	<!-- 更新书籍状态为待交书 -->
+	<update id="updateStateToGetBook">
+		update rb_share set state=3 where share_id=#{shareId}
+	</update>
+	<!-- 更新书籍状态为已入库 -->
+	<update id="updateStateToPut">
+		update rb_share set state=2 where share_id=#{shareId}
+	</update>
+	<!-- 根据shareId查询userId -->
+	<select id="getUserIdByShareId" resultType="string">
+		select user_id from rb_share where share_id=#{shareId}
+	</select>
+	<update id="updateStateToCancle">
+		update rb_share set state=1 where share_id=#{shareId}
+	</update>
+	<!-- 根据rankby获取所有用户分享的书本 -->
+	<select id="getAllSharesByRankby" resultType="com.readbook.pojo.RbShare">
+		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,proposed_date AS proposedDate,book_name AS bookName,
+  		author,phone,state,deliever_way AS delieverWay,location FROM rb_share 
+  		WHERE 
+  		<if test="rankby==0">
+  			1=1;
+  		</if>
+  		<if test="rankby==1">
+  			state=0;
+  		</if>
+  		<if test="rankby==2">
+  			state=1;
+  		</if>
+  		<if test="rankby==3">
+  			state=2;
+  		</if>
+	</select>
+	<!-- 获取用户分享的书本 -->
+  <select id="findUserSharesByCondition" resultType="com.readbook.pojo.RbShare">
+  		SELECT share_id AS shareId,book_id as bookId,user_id AS userId,proposed_date AS proposedDate,book_name AS bookName,
+  author,phone,state,deliever_way AS delieverWay,location FROM rb_share WHERE user_id=#{0} AND state=#{1} LIMIT #{2},#{3}
+  </select>
+
+   <resultMap id="BaseResultMap" type="com.readbook.pojo.RbShare" >
+    <id column="share_id" property="shareId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="proposed_date" property="proposedDate" jdbcType="TIMESTAMP" />
+    <result column="book_name" property="bookName" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="deliever_way" property="delieverWay" jdbcType="INTEGER" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="pub_house" property="pubHouse" jdbcType="VARCHAR" />
+    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    share_id, user_id, proposed_date, book_name, author, phone, state, deliever_way, 
+    location, pub_house, book_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbShareExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_share
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from rb_share
+    where share_id = #{shareId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_share
+    where share_id = #{shareId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbShareExample" >
+    delete from rb_share
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbShare" >
+    insert into rb_share (share_id, user_id, proposed_date, 
+      book_name, author, phone, 
+      state, deliever_way, location, 
+      pub_house, book_id)
+    values (#{shareId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{proposedDate,jdbcType=TIMESTAMP}, 
+      #{bookName,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{state,jdbcType=INTEGER}, #{delieverWay,jdbcType=INTEGER}, #{location,jdbcType=VARCHAR}, 
+      #{pubHouse,jdbcType=VARCHAR}, #{bookId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyProperty="shareId" useGeneratedKeys="true" parameterType="com.readbook.pojo.RbShare" >
+    insert into rb_share
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="shareId != null" >
+        share_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date,
+      </if>
+      <if test="bookName != null" >
+        book_name,
+      </if>
+      <if test="author != null" >
+        author,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="delieverWay != null" >
+        deliever_way,
+      </if>
+      <if test="location != null" >
+        location,
+      </if>
+      <if test="pubHouse != null" >
+        pub_house,
+      </if>
+      <if test="bookId != null" >
+        book_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="shareId != null" >
+        #{shareId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookName != null" >
+        #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="delieverWay != null" >
+        #{delieverWay,jdbcType=INTEGER},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        #{bookId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbShareExample" resultType="java.lang.Integer" >
+    select count(*) from rb_share
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_share
+    <set >
+      <if test="record.shareId != null" >
+        share_id = #{record.shareId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proposedDate != null" >
+        proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.bookName != null" >
+        book_name = #{record.bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.author != null" >
+        author = #{record.author,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null" >
+        state = #{record.state,jdbcType=INTEGER},
+      </if>
+      <if test="record.delieverWay != null" >
+        deliever_way = #{record.delieverWay,jdbcType=INTEGER},
+      </if>
+      <if test="record.location != null" >
+        location = #{record.location,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pubHouse != null" >
+        pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bookId != null" >
+        book_id = #{record.bookId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_share
+    set share_id = #{record.shareId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      proposed_date = #{record.proposedDate,jdbcType=TIMESTAMP},
+      book_name = #{record.bookName,jdbcType=VARCHAR},
+      author = #{record.author,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=INTEGER},
+      deliever_way = #{record.delieverWay,jdbcType=INTEGER},
+      location = #{record.location,jdbcType=VARCHAR},
+      pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      book_id = #{record.bookId,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbShare" >
+    update rb_share
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="proposedDate != null" >
+        proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookName != null" >
+        book_name = #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="delieverWay != null" >
+        deliever_way = #{delieverWay,jdbcType=INTEGER},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        pub_house = #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        book_id = #{bookId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where share_id = #{shareId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbShare" >
+    update rb_share
+    set user_id = #{userId,jdbcType=VARCHAR},
+      proposed_date = #{proposedDate,jdbcType=TIMESTAMP},
+      book_name = #{bookName,jdbcType=VARCHAR},
+      author = #{author,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      deliever_way = #{delieverWay,jdbcType=INTEGER},
+      location = #{location,jdbcType=VARCHAR},
+      pub_house = #{pubHouse,jdbcType=VARCHAR},
+      book_id = #{bookId,jdbcType=VARCHAR}
+    where share_id = #{shareId,jdbcType=INTEGER}
+  </update>
+</mapper>

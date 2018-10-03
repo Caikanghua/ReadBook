@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbQandaMapper" >
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbQanda" >
+    <id column="qanda_id" property="qandaId" jdbcType="INTEGER" />
+    <result column="push_date" property="pushDate" jdbcType="TIMESTAMP" />
+    <result column="question" property="question" jdbcType="VARCHAR" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
+    <result column="helpful_cnt" property="helpfulCnt" jdbcType="INTEGER" />
+    <result column="is_delete" property="isDelete" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    qanda_id, push_date, question, answer, helpful_cnt, is_delete
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbQandaExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_qanda
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from rb_qanda
+    where qanda_id = #{qandaId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from rb_qanda
+    where qanda_id = #{qandaId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbQandaExample" >
+    delete from rb_qanda
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbQanda" >
+    insert into rb_qanda (qanda_id, push_date, question, 
+      answer, helpful_cnt, is_delete
+      )
+    values (#{qandaId,jdbcType=INTEGER}, #{pushDate,jdbcType=TIMESTAMP}, #{question,jdbcType=VARCHAR}, 
+      #{answer,jdbcType=VARCHAR}, #{helpfulCnt,jdbcType=INTEGER}, #{isDelete,jdbcType=BIT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbQanda" >
+    insert into rb_qanda
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="qandaId != null" >
+        qanda_id,
+      </if>
+      <if test="pushDate != null" >
+        push_date,
+      </if>
+      <if test="question != null" >
+        question,
+      </if>
+      <if test="answer != null" >
+        answer,
+      </if>
+      <if test="helpfulCnt != null" >
+        helpful_cnt,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="qandaId != null" >
+        #{qandaId,jdbcType=INTEGER},
+      </if>
+      <if test="pushDate != null" >
+        #{pushDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="question != null" >
+        #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null" >
+        #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="helpfulCnt != null" >
+        #{helpfulCnt,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbQandaExample" resultType="java.lang.Integer" >
+    select count(*) from rb_qanda
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_qanda
+    <set >
+      <if test="record.qandaId != null" >
+        qanda_id = #{record.qandaId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pushDate != null" >
+        push_date = #{record.pushDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.question != null" >
+        question = #{record.question,jdbcType=VARCHAR},
+      </if>
+      <if test="record.answer != null" >
+        answer = #{record.answer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.helpfulCnt != null" >
+        helpful_cnt = #{record.helpfulCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.isDelete != null" >
+        is_delete = #{record.isDelete,jdbcType=BIT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_qanda
+    set qanda_id = #{record.qandaId,jdbcType=INTEGER},
+      push_date = #{record.pushDate,jdbcType=TIMESTAMP},
+      question = #{record.question,jdbcType=VARCHAR},
+      answer = #{record.answer,jdbcType=VARCHAR},
+      helpful_cnt = #{record.helpfulCnt,jdbcType=INTEGER},
+      is_delete = #{record.isDelete,jdbcType=BIT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbQanda" >
+    update rb_qanda
+    <set >
+      <if test="pushDate != null" >
+        push_date = #{pushDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="question != null" >
+        question = #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="answer != null" >
+        answer = #{answer,jdbcType=VARCHAR},
+      </if>
+      <if test="helpfulCnt != null" >
+        helpful_cnt = #{helpfulCnt,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=BIT},
+      </if>
+    </set>
+    where qanda_id = #{qandaId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbQanda" >
+    update rb_qanda
+    set push_date = #{pushDate,jdbcType=TIMESTAMP},
+      question = #{question,jdbcType=VARCHAR},
+      answer = #{answer,jdbcType=VARCHAR},
+      helpful_cnt = #{helpfulCnt,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=BIT}
+    where qanda_id = #{qandaId,jdbcType=INTEGER}
+  </update>
+</mapper>

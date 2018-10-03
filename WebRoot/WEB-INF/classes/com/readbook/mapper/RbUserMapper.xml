@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbUserMapper" >
+	<!-- 获取部分用户信息 -->
+	<select id="getUserPartDetailByUserId" resultType="com.readbook.pojo.RbUser">
+		select user_id as userId,nick_name as nickName,sex,read_cnt as readCnt,
+		share_cnt as shareCnt,star_cnt as starCnt,picture_url as pictureUrl from rb_user where user_id = #{userId}
+	</select>
+	<!-- 添加用户点赞 -->
+	<insert id="addUserStar">
+		insert into rb_user_star(user_id,comment_id) values(#{userId},#{commentId})
+	</insert>
+	<!-- 查询用户点赞 -->
+	<select id="checkAgainStar" resultType="com.readbook.pojo.RbUserStar">
+		select user_id as userId,comment_id as commentId from rb_user_star where user_id=#{userId} and comment_id=#{commentId}
+	</select>
+	<!-- 获取用户昵称 -->
+	<select id="getUserNickName" resultType="string">
+		select nick_name from rb_user where user_id=#{userId}
+	</select>
+	<!-- 锁定或解锁用户 -->
+	<update id="lock">
+		UPDATE rb_user SET is_legal =#{1} WHERE user_id=#{0}
+	</update>
+	<!-- 自增用户的分享书籍数量 -->
+	<update id="updateShareCntInc">
+		update rb_user set share_cnt =share_cnt+1 where user_id=#{userId}
+	</update>
+	<!-- 更新用户的阅读量 -->
+	<update id="updateReadCnt">
+		UPDATE rb_user SET read_cnt=read_cnt +1 WHERE user_id=#{userId}
+	</update>
+
+	<select id="getIdAndName" resultType="com.readbook.pojo.RbUser">
+		select user_id as userId,nick_name as nickName from rb_user where user_id=#{0}
+	</select>
+
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbUser" >
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+    <result column="stu_num" property="stuNum" jdbcType="VARCHAR" />
+    <result column="college" property="college" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="BIT" />
+    <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+    <result column="wechat" property="wechat" jdbcType="VARCHAR" />
+    <result column="read_cnt" property="readCnt" jdbcType="INTEGER" />
+    <result column="share_cnt" property="shareCnt" jdbcType="INTEGER" />
+    <result column="star_cnt" property="starCnt" jdbcType="INTEGER" />
+    <result column="likes_tag" property="likesTag" jdbcType="VARCHAR" />
+    <result column="register_time" property="registerTime" jdbcType="TIMESTAMP" />
+    <result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+    <result column="is_legal" property="isLegal" jdbcType="BIT" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    user_id, NAME, nick_name, stu_num, college, phone, sex, PASSWORD, wechat, read_cnt, 
+    share_cnt, star_cnt, likes_tag, register_time, login_time, is_legal, picture_url
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbUserExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from rb_user
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rb_user
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbUserExample" >
+    delete from rb_user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbUser" >
+    insert into rb_user (user_id, NAME, nick_name, 
+      stu_num, college, phone, 
+      sex, PASSWORD, wechat, 
+      read_cnt, share_cnt, star_cnt, 
+      likes_tag, register_time, login_time, 
+      is_legal, picture_url)
+    values (#{userId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
+      #{stuNum,jdbcType=VARCHAR}, #{college,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=BIT}, #{password,jdbcType=VARCHAR}, #{wechat,jdbcType=VARCHAR}, 
+      #{readCnt,jdbcType=INTEGER}, #{shareCnt,jdbcType=INTEGER}, #{starCnt,jdbcType=INTEGER}, 
+      #{likesTag,jdbcType=VARCHAR}, #{registerTime,jdbcType=TIMESTAMP}, #{loginTime,jdbcType=TIMESTAMP}, 
+      #{isLegal,jdbcType=BIT}, #{pictureUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbUser" >
+    insert into rb_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="nickName != null" >
+        nick_name,
+      </if>
+      <if test="stuNum != null" >
+        stu_num,
+      </if>
+      <if test="college != null" >
+        college,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="password != null" >
+        PASSWORD,
+      </if>
+      <if test="wechat != null" >
+        wechat,
+      </if>
+      <if test="readCnt != null" >
+        read_cnt,
+      </if>
+      <if test="shareCnt != null" >
+        share_cnt,
+      </if>
+      <if test="starCnt != null" >
+        star_cnt,
+      </if>
+      <if test="likesTag != null" >
+        likes_tag,
+      </if>
+      <if test="registerTime != null" >
+        register_time,
+      </if>
+      <if test="loginTime != null" >
+        login_time,
+      </if>
+      <if test="isLegal != null" >
+        is_legal,
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="stuNum != null" >
+        #{stuNum,jdbcType=VARCHAR},
+      </if>
+      <if test="college != null" >
+        #{college,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=BIT},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="wechat != null" >
+        #{wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="readCnt != null" >
+        #{readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="shareCnt != null" >
+        #{shareCnt,jdbcType=INTEGER},
+      </if>
+      <if test="starCnt != null" >
+        #{starCnt,jdbcType=INTEGER},
+      </if>
+      <if test="likesTag != null" >
+        #{likesTag,jdbcType=VARCHAR},
+      </if>
+      <if test="registerTime != null" >
+        #{registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTime != null" >
+        #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isLegal != null" >
+        #{isLegal,jdbcType=BIT},
+      </if>
+      <if test="pictureUrl != null" >
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbUserExample" resultType="java.lang.Integer" >
+    select count(*) from rb_user
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_user
+    <set >
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        NAME = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nickName != null" >
+        nick_name = #{record.nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stuNum != null" >
+        stu_num = #{record.stuNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.college != null" >
+        college = #{record.college,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null" >
+        sex = #{record.sex,jdbcType=BIT},
+      </if>
+      <if test="record.password != null" >
+        PASSWORD = #{record.password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wechat != null" >
+        wechat = #{record.wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="record.readCnt != null" >
+        read_cnt = #{record.readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.shareCnt != null" >
+        share_cnt = #{record.shareCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.starCnt != null" >
+        star_cnt = #{record.starCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.likesTag != null" >
+        likes_tag = #{record.likesTag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registerTime != null" >
+        register_time = #{record.registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.loginTime != null" >
+        login_time = #{record.loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.isLegal != null" >
+        is_legal = #{record.isLegal,jdbcType=BIT},
+      </if>
+      <if test="record.pictureUrl != null" >
+        picture_url = #{record.pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_user
+    set user_id = #{record.userId,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      nick_name = #{record.nickName,jdbcType=VARCHAR},
+      stu_num = #{record.stuNum,jdbcType=VARCHAR},
+      college = #{record.college,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=BIT},
+      PASSWORD = #{record.password,jdbcType=VARCHAR},
+      wechat = #{record.wechat,jdbcType=VARCHAR},
+      read_cnt = #{record.readCnt,jdbcType=INTEGER},
+      share_cnt = #{record.shareCnt,jdbcType=INTEGER},
+      star_cnt = #{record.starCnt,jdbcType=INTEGER},
+      likes_tag = #{record.likesTag,jdbcType=VARCHAR},
+      register_time = #{record.registerTime,jdbcType=TIMESTAMP},
+      login_time = #{record.loginTime,jdbcType=TIMESTAMP},
+      is_legal = #{record.isLegal,jdbcType=BIT},
+      picture_url = #{record.pictureUrl,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbUser" >
+    update rb_user
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null" >
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="stuNum != null" >
+        stu_num = #{stuNum,jdbcType=VARCHAR},
+      </if>
+      <if test="college != null" >
+        college = #{college,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=BIT},
+      </if>
+      <if test="password != null" >
+        PASSWORD = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="wechat != null" >
+        wechat = #{wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="readCnt != null" >
+        read_cnt = #{readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="shareCnt != null" >
+        share_cnt = #{shareCnt,jdbcType=INTEGER},
+      </if>
+      <if test="starCnt != null" >
+        star_cnt = #{starCnt,jdbcType=INTEGER},
+      </if>
+      <if test="likesTag != null" >
+        likes_tag = #{likesTag,jdbcType=VARCHAR},
+      </if>
+      <if test="registerTime != null" >
+        register_time = #{registerTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTime != null" >
+        login_time = #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isLegal != null" >
+        is_legal = #{isLegal,jdbcType=BIT},
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbUser" >
+    update rb_user
+    set NAME = #{name,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      stu_num = #{stuNum,jdbcType=VARCHAR},
+      college = #{college,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=BIT},
+      PASSWORD = #{password,jdbcType=VARCHAR},
+      wechat = #{wechat,jdbcType=VARCHAR},
+      read_cnt = #{readCnt,jdbcType=INTEGER},
+      share_cnt = #{shareCnt,jdbcType=INTEGER},
+      star_cnt = #{starCnt,jdbcType=INTEGER},
+      likes_tag = #{likesTag,jdbcType=VARCHAR},
+      register_time = #{registerTime,jdbcType=TIMESTAMP},
+      login_time = #{loginTime,jdbcType=TIMESTAMP},
+      is_legal = #{isLegal,jdbcType=BIT},
+      picture_url = #{pictureUrl,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+</mapper>

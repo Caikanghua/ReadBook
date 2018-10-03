@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.AttentionMapper" >
+	<!-- 获取关注者id -->
+	<select id="getAllUserId" resultType="string">
+		select attention_user from attention where be_attention_user = #{beAttentionUser}
+	</select>
+	<!-- 获取用户关注的所有用户信息 -->
+	<select id="selectAllAttention" resultType="com.readbook.pojo.RbUser">
+		select user_id as userId,nick_name as nickName,read_cnt as readCnt,picture_url as pictureUrl,share_cnt as shareCnt,star_cnt as starCnt from 
+		rb_user where user_id in (select be_attention_user from attention where attention_user = #{userId});
+	</select>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.Attention" >
+    <id column="a_id" property="aId" jdbcType="INTEGER" />
+    <result column="attention_user" property="attentionUser" jdbcType="VARCHAR" />
+    <result column="be_attention_user" property="beAttentionUser" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    a_id, attention_user, be_attention_user
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.AttentionExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from attention
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from attention
+    where a_id = #{aId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from attention
+    where a_id = #{aId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.AttentionExample" >
+    delete from attention
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.Attention" >
+    insert into attention (a_id, attention_user, be_attention_user
+      )
+    values (#{aId,jdbcType=INTEGER}, #{attentionUser,jdbcType=VARCHAR}, #{beAttentionUser,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.Attention" >
+    insert into attention
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="aId != null" >
+        a_id,
+      </if>
+      <if test="attentionUser != null" >
+        attention_user,
+      </if>
+      <if test="beAttentionUser != null" >
+        be_attention_user,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="aId != null" >
+        #{aId,jdbcType=INTEGER},
+      </if>
+      <if test="attentionUser != null" >
+        #{attentionUser,jdbcType=VARCHAR},
+      </if>
+      <if test="beAttentionUser != null" >
+        #{beAttentionUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.AttentionExample" resultType="java.lang.Integer" >
+    select count(*) from attention
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update attention
+    <set >
+      <if test="record.aId != null" >
+        a_id = #{record.aId,jdbcType=INTEGER},
+      </if>
+      <if test="record.attentionUser != null" >
+        attention_user = #{record.attentionUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.beAttentionUser != null" >
+        be_attention_user = #{record.beAttentionUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update attention
+    set a_id = #{record.aId,jdbcType=INTEGER},
+      attention_user = #{record.attentionUser,jdbcType=VARCHAR},
+      be_attention_user = #{record.beAttentionUser,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.Attention" >
+    update attention
+    <set >
+      <if test="attentionUser != null" >
+        attention_user = #{attentionUser,jdbcType=VARCHAR},
+      </if>
+      <if test="beAttentionUser != null" >
+        be_attention_user = #{beAttentionUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where a_id = #{aId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.Attention" >
+    update attention
+    set attention_user = #{attentionUser,jdbcType=VARCHAR},
+      be_attention_user = #{beAttentionUser,jdbcType=VARCHAR}
+    where a_id = #{aId,jdbcType=INTEGER}
+  </update>
+</mapper>

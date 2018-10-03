@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbPostMapper" >
+	<!-- 获取书评总记录数 -->
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_post
+	</select>
+	<select id="getCommentMessage" resultType="com.readbook.pojo.CommentMessage">
+		select comment_id as commentId,from_id as fromId,from_name as fromName,
+		ucontent as content,comment_type as commentType,time as commentTime from rb_usercomment where at_id=#{userId}  order by time desc limit #{start_num},#{page_size}; 
+	</select>
+    <select id="getPostUserId" resultType="string">
+    	select user_id from rb_post where comment_id=#{commentId}
+    </select>
+   
+	<update id="decCommentCnt">
+		update rb_post set comment_cnt =comment_cnt-1 where comment_id=#{commentId}
+	</update>
+	<select id="getDetailPost" resultMap="resultPosts">
+		SELECT * FROM rb_post rp  LEFT JOIN rb_usercomment ru ON ru.comment_id=rp.comment_id WHERE rp.comment_id=#{commentId}
+	</select>
+	<update id="incCommentCnt">
+		update rb_post set comment_cnt=comment_cnt+1 where comment_id=#{commentId}
+	</update>
+	<!-- 获取所有书评，不包括评论 -->
+	<select id="getAllPost" resultMap="resultAllPosts">
+		select * from rb_post ORDER BY pub_date DESC limit #{0},#{1}
+	</select>
+	 <!-- 根据书id获取所有书评 -->
+    <select id="getAllPostByBookId" resultMap="resultAllPosts">
+    	select * from rb_post where book_id = #{isbn}
+    </select>
+	<!-- 根据postId获取post,不包括评论 -->
+	<select id="getPostById" resultMap="resultAllPosts">
+		select * from rb_post where comment_id = #{commentId}
+	</select>
+	<select id="getPostsByType" resultMap="resultPosts">
+		SELECT * FROM rb_post rp LEFT JOIN post_middle_comment m ON rp.comment_id=m.m_post_id LEFT JOIN rb_userComment rc 
+		ON m.m_comment_id=rc.u_comment_id 
+		WHERE
+		<if test="type==0">
+			1=1 limit #{start_num},#{page_size};
+		</if>
+		<if test="type==1">
+			rp.comment_id=#{commentId} limit #{start_num},#{page_size};
+		</if>
+		
+	</select>
+
+	<update id="insertStarToPost">
+		UPDATE rb_post SET stars =stars+1 WHERE comment_id=#{0};
+	</update>
+	<select id="getUserPostsByCondition" resultMap="resultAllPosts">
+		select * from rb_post WHERE user_id=#{0} 
+			<if test="1==1">
+				ORDER BY view_cnt DESC
+			</if> 
+			<if test="1==0">
+				ORDER BY pub_date DESC
+			</if>
+			<if test="1==2">
+				ORDER BY comment_cnt DESC
+			</if>
+			   LIMIT #{2},#{3}
+	</select>
+	 <resultMap id="resultAllPosts" type="com.readbook.pojo.RbPost" >
+	    <id column="comment_id" property="commentId" jdbcType="VARCHAR" />
+	    <result column="pub_date" property="pubDate" jdbcType="TIMESTAMP" />
+	    <result column="title" property="title" jdbcType="VARCHAR" />
+	    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+	    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+	    <result column="pictures" property="pictures" jdbcType="VARCHAR" />
+	    <result column="Stars" property="stars" jdbcType="INTEGER" />
+	    <result column="is_legal" property="isLegal" jdbcType="BIT" />
+	    <result column="view_cnt" property="viewCnt" jdbcType="INTEGER" />
+	    <result column="priority" property="priority" jdbcType="INTEGER" />
+	    <result column="comment_cnt" property="commentCnt" jdbcType="INTEGER" />
+	     <result column="content" property="content" jdbcType="LONGVARCHAR" />
+	    <association property="bookName" column="book_id" select="getBookName"/>
+	    <association property="nickName" column="user_id" select="getNickName"/>
+	     <association property="pictureUrl" column="user_id" select="getPictureUrl"/>
+  </resultMap>
+	
+	
+	
+	
+   <resultMap id="resultPosts" type="com.readbook.pojo.RbPost" >
+	    <id column="comment_id" property="commentId" jdbcType="VARCHAR" />
+	    <result column="pub_date" property="pubDate" jdbcType="TIMESTAMP" />
+	    <result column="title" property="title" jdbcType="VARCHAR" />
+	    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+	    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+	    <result column="pictures" property="pictures" jdbcType="VARCHAR" />
+	    <result column="Stars" property="stars" jdbcType="INTEGER" />
+	    <result column="is_legal" property="isLegal" jdbcType="BIT" />
+	    <result column="view_cnt" property="viewCnt" jdbcType="INTEGER" />
+	    <result column="priority" property="priority" jdbcType="INTEGER" />
+	    <result column="comment_cnt" property="commentCnt" jdbcType="INTEGER" />
+	     <result column="content" property="content" jdbcType="LONGVARCHAR" />
+	    <association property="bookName" column="book_id" select="getBookName"/>
+	    <association property="nickName" column="user_id" select="getNickName"/>
+	    <association property="pictureUrl" column="user_id" select="getPictureUrl"/>
+	     <collection property="commentList" column="comment_id" ofType="com.readbook.pojo.RbUsercomment">
+	     	<id column="u_comment_id" property="uCommentId" jdbcType="VARCHAR" />
+		    <result column="comment_type" property="commentType" jdbcType="INTEGER" />
+		    <result column="from_id" property="fromId" jdbcType="VARCHAR" />
+		    <result column="from_name" property="fromName" jdbcType="VARCHAR" />
+		    <result column="to_comment_id" property="toCommentId" jdbcType="VARCHAR" />
+		    <result column="at_id" property="atId" jdbcType="VARCHAR" />
+		    <result column="at_name" property="atName" jdbcType="VARCHAR" />
+		    <result column="TIME" property="time" jdbcType="TIMESTAMP" />
+		    <result column="comment_id" property="commentId" jdbcType="TIMESTAMP" />
+	     	 <result column="ucontent" property="ucontent" jdbcType="LONGVARCHAR" />
+	     	  <association property="fromIdPic" column="from_id" select="getFromPictureUrl"/>
+	     </collection>
+  </resultMap>
+	<select id="getBookName" resultType="string">
+		select name from rb_book where isbn=#{book_id}
+	</select>
+	<select id="getNickName" resultType="string">
+		select nick_name from rb_user where user_id=#{user_id}
+	</select>
+	<select id="getPictureUrl" resultType="string">
+		select picture_url as pictureUrl from rb_user where user_id=#{user_id}
+	</select>
+	<select id="getFromPictureUrl" resultType="string">
+		select picture_url as fromIdPic from rb_user where user_id=#{from_id}
+	</select>
+	
+	<resultMap id="BaseResultMap" type="com.readbook.pojo.RbPost" >
+    <id column="comment_id" property="commentId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+    <result column="pub_date" property="pubDate" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="pictures" property="pictures" jdbcType="VARCHAR" />
+    <result column="Stars" property="stars" jdbcType="INTEGER" />
+    <result column="is_legal" property="isLegal" jdbcType="BIT" />
+    <result column="view_cnt" property="viewCnt" jdbcType="INTEGER" />
+    <result column="priority" property="priority" jdbcType="INTEGER" />
+    <result column="comment_cnt" property="commentCnt" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbPost" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    comment_id, user_id, book_id, pub_date, title, pictures, Stars, is_legal, view_cnt, 
+    priority, comment_cnt
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbPostExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbPostExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_post
+    where comment_id = #{commentId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rb_post
+    where comment_id = #{commentId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbPostExample" >
+    delete from rb_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbPost" >
+    insert into rb_post (comment_id, user_id, book_id, 
+      pub_date, title, pictures, 
+      Stars, is_legal, view_cnt, 
+      priority, comment_cnt, content
+      )
+    values (#{commentId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{bookId,jdbcType=VARCHAR}, 
+      #{pubDate,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, #{pictures,jdbcType=VARCHAR}, 
+      #{stars,jdbcType=INTEGER}, #{isLegal,jdbcType=BIT}, #{viewCnt,jdbcType=INTEGER}, 
+      #{priority,jdbcType=INTEGER}, #{commentCnt,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbPost" >
+    insert into rb_post
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="commentId != null" >
+        comment_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="bookId != null" >
+        book_id,
+      </if>
+      <if test="pubDate != null" >
+        pub_date,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="pictures != null" >
+        pictures,
+      </if>
+      <if test="stars != null" >
+        Stars,
+      </if>
+      <if test="isLegal != null" >
+        is_legal,
+      </if>
+      <if test="viewCnt != null" >
+        view_cnt,
+      </if>
+      <if test="priority != null" >
+        priority,
+      </if>
+      <if test="commentCnt != null" >
+        comment_cnt,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="commentId != null" >
+        #{commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        #{bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="pubDate != null" >
+        #{pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="pictures != null" >
+        #{pictures,jdbcType=VARCHAR},
+      </if>
+      <if test="stars != null" >
+        #{stars,jdbcType=INTEGER},
+      </if>
+      <if test="isLegal != null" >
+        #{isLegal,jdbcType=BIT},
+      </if>
+      <if test="viewCnt != null" >
+        #{viewCnt,jdbcType=INTEGER},
+      </if>
+      <if test="priority != null" >
+        #{priority,jdbcType=INTEGER},
+      </if>
+      <if test="commentCnt != null" >
+        #{commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbPostExample" resultType="java.lang.Integer" >
+    select count(*) from rb_post
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_post
+    <set >
+      <if test="record.commentId != null" >
+        comment_id = #{record.commentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bookId != null" >
+        book_id = #{record.bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pubDate != null" >
+        pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.title != null" >
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pictures != null" >
+        pictures = #{record.pictures,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stars != null" >
+        Stars = #{record.stars,jdbcType=INTEGER},
+      </if>
+      <if test="record.isLegal != null" >
+        is_legal = #{record.isLegal,jdbcType=BIT},
+      </if>
+      <if test="record.viewCnt != null" >
+        view_cnt = #{record.viewCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.priority != null" >
+        priority = #{record.priority,jdbcType=INTEGER},
+      </if>
+      <if test="record.commentCnt != null" >
+        comment_cnt = #{record.commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_post
+    set comment_id = #{record.commentId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      book_id = #{record.bookId,jdbcType=VARCHAR},
+      pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      pictures = #{record.pictures,jdbcType=VARCHAR},
+      Stars = #{record.stars,jdbcType=INTEGER},
+      is_legal = #{record.isLegal,jdbcType=BIT},
+      view_cnt = #{record.viewCnt,jdbcType=INTEGER},
+      priority = #{record.priority,jdbcType=INTEGER},
+      comment_cnt = #{record.commentCnt,jdbcType=INTEGER},
+      content = #{record.content,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_post
+    set comment_id = #{record.commentId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      book_id = #{record.bookId,jdbcType=VARCHAR},
+      pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      title = #{record.title,jdbcType=VARCHAR},
+      pictures = #{record.pictures,jdbcType=VARCHAR},
+      Stars = #{record.stars,jdbcType=INTEGER},
+      is_legal = #{record.isLegal,jdbcType=BIT},
+      view_cnt = #{record.viewCnt,jdbcType=INTEGER},
+      priority = #{record.priority,jdbcType=INTEGER},
+      comment_cnt = #{record.commentCnt,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbPost" >
+    update rb_post
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        book_id = #{bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="pubDate != null" >
+        pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="pictures != null" >
+        pictures = #{pictures,jdbcType=VARCHAR},
+      </if>
+      <if test="stars != null" >
+        Stars = #{stars,jdbcType=INTEGER},
+      </if>
+      <if test="isLegal != null" >
+        is_legal = #{isLegal,jdbcType=BIT},
+      </if>
+      <if test="viewCnt != null" >
+        view_cnt = #{viewCnt,jdbcType=INTEGER},
+      </if>
+      <if test="priority != null" >
+        priority = #{priority,jdbcType=INTEGER},
+      </if>
+      <if test="commentCnt != null" >
+        comment_cnt = #{commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where comment_id = #{commentId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbPost" >
+    update rb_post
+    set user_id = #{userId,jdbcType=VARCHAR},
+      book_id = #{bookId,jdbcType=VARCHAR},
+      pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      pictures = #{pictures,jdbcType=VARCHAR},
+      Stars = #{stars,jdbcType=INTEGER},
+      is_legal = #{isLegal,jdbcType=BIT},
+      view_cnt = #{viewCnt,jdbcType=INTEGER},
+      priority = #{priority,jdbcType=INTEGER},
+      comment_cnt = #{commentCnt,jdbcType=INTEGER},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where comment_id = #{commentId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbPost" >
+    update rb_post
+    set user_id = #{userId,jdbcType=VARCHAR},
+      book_id = #{bookId,jdbcType=VARCHAR},
+      pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      pictures = #{pictures,jdbcType=VARCHAR},
+      Stars = #{stars,jdbcType=INTEGER},
+      is_legal = #{isLegal,jdbcType=BIT},
+      view_cnt = #{viewCnt,jdbcType=INTEGER},
+      priority = #{priority,jdbcType=INTEGER},
+      comment_cnt = #{commentCnt,jdbcType=INTEGER}
+    where comment_id = #{commentId,jdbcType=VARCHAR}
+  </update>
+</mapper>

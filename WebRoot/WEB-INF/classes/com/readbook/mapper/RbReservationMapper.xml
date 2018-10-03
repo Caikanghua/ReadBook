@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbReservationMapper" >
+	<!-- 更新remind -->
+	<update id="updateRemind">
+		update rb_reservation set remind = #{0} where reservation_id = #{1}
+	</update>
+	<!-- 获取未归还的预约书 -->
+	<select id="getBeforeResturnReservation" resultType="com.readbook.pojo.RbReservation">
+		select reservation_id as reservationId,book_id as bookId,user_id as userId,taken_date as takenDate,phone from rb_reservation  where deadline is null and remind=0 and state = 3;
+	</select>
+	<select id="getReservationList" resultMap="associateResultMap">
+		SELECT * FROM rb_reservation 
+		WHERE state = #{randby}
+		limit #{index},#{count};
+	</select>
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_reservation where state = #{randby}
+	</select>
+	<select id="getAllRbservations" resultType="com.readbook.pojo.RbReservation">
+		SELECT reservation_id as reservationId, user_id AS userId,book_id AS bookId,deadline,state,taken_date AS takenDate,
+		return_date AS returnDate,phone FROM rb_reservation WHERE user_id=#{0} order by state asc LIMIT #{1},#{2}
+	</select>
+	<!-- 更改状态为5（已经归还） -->
+	<update id="updateStateToFive">
+		update rb_reservation set state=5 where reservation_id=#{reservationId}
+	</update>
+	<!-- 根据预约书id更新预约书状态为3(待归还) -->
+	<update id="updateStateToThree">
+		update rb_reservation set state=3 where reservation_id=#{reservationId}
+	</update>
+	<!-- 获取该书的状态 -->
+	<select id="getStateById" resultType="string">
+		select state from rb_reservation where reservation_id=#{reservationId}
+	</select>
+	<!-- 查询用户在借状态的书籍数量 -->
+	<select id="checkIsTwoBook" resultType="string">
+		select count(*) from rb_reservation where user_id=#{userId} and state!=5 
+	</select>
+	<!-- 根据条件获取预约记录 -->
+	<select id="getReservationsByRankby" resultType="com.readbook.pojo.RbReservation">
+		SELECT reservation_id as reservationId,user_id AS userId,book_id AS bookId,deadline,state,taken_date AS takenDate,
+		return_date AS returnDate,phone FROM rb_reservation 
+		WHERE state = #{rankby}
+	</select>
+	<!-- 检查用户是否预约了相同的书 -->
+	<select id="checkIfOrdered" resultType="com.readbook.pojo.RbReservation">
+		select reservation_id as reservationId, user_id AS userId,book_id AS bookId from rb_reservation 
+		where user_id=#{0} and book_id=#{1} and state=0;
+		
+	</select>
+	<!-- 用户预约书分页查询 -->
+	<select id="getRbservationsByCondition" resultType="com.readbook.pojo.RbReservation">
+		SELECT reservation_id as reservationId, user_id AS userId,book_id AS bookId,deadline,state,taken_date AS takenDate,
+		return_date AS returnDate,phone FROM rb_reservation WHERE user_id=#{0} and state=#{1} LIMIT #{2},#{3}
+	</select>
+	<resultMap id="associateResultMap" type="com.readbook.pojo.RbReservation" >
+	    <id column="reservation_id" property="reservationId" jdbcType="VARCHAR" />
+	    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+	    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+	    <result column="state" property="state" jdbcType="INTEGER" />
+	    <result column="deadline" property="deadline" jdbcType="TIMESTAMP" />
+	    <result column="taken_date" property="takenDate" jdbcType="TIMESTAMP" />
+	    <result column="return_date" property="returnDate" jdbcType="TIMESTAMP" />
+	    <result column="phone" property="phone" jdbcType="VARCHAR" />
+	    <association property="rbBook" column="book_id" select="getBookById"></association>
+	    <association property="rbUser" column="user_id" select="getUserById"></association>
+	  </resultMap>
+  	  <select id="getBookById" resultType="com.readbook.pojo.RbBook">
+  	  	 select name,isbn,author,pub_house as pubHouse,book_img as bookImg from rb_book where isbn = #{book_id}
+  	  </select>
+  	  <select id="getUserById" resultType="com.readbook.pojo.RbUser">
+  	  	 select name,stu_num as stuNum,college,is_legal as isLegal from rb_user where user_id =#{user_id}
+  	  </select>
+  
+  
+  
+  
+   <resultMap id="BaseResultMap" type="com.readbook.pojo.RbReservation" >
+    <id column="reservation_id" property="reservationId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="book_id" property="bookId" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="deadline" property="deadline" jdbcType="TIMESTAMP" />
+    <result column="taken_date" property="takenDate" jdbcType="TIMESTAMP" />
+    <result column="return_date" property="returnDate" jdbcType="TIMESTAMP" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    reservation_id, user_id, book_id, state, deadline, taken_date, return_date, phone
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbReservationExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_reservation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from rb_reservation
+    where reservation_id = #{reservationId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rb_reservation
+    where reservation_id = #{reservationId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbReservationExample" >
+    delete from rb_reservation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbReservation" >
+    insert into rb_reservation (reservation_id, user_id, book_id, 
+      state, deadline, taken_date, 
+      return_date, phone)
+    values (#{reservationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{bookId,jdbcType=VARCHAR}, 
+      #{state,jdbcType=INTEGER}, #{deadline,jdbcType=TIMESTAMP}, #{takenDate,jdbcType=TIMESTAMP}, 
+      #{returnDate,jdbcType=TIMESTAMP}, #{phone,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbReservation" >
+    insert into rb_reservation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="reservationId != null" >
+        reservation_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="bookId != null" >
+        book_id,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="deadline != null" >
+        deadline,
+      </if>
+      <if test="takenDate != null" >
+        taken_date,
+      </if>
+      <if test="returnDate != null" >
+        return_date,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="reservationId != null" >
+        #{reservationId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        #{bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="deadline != null" >
+        #{deadline,jdbcType=TIMESTAMP},
+      </if>
+      <if test="takenDate != null" >
+        #{takenDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="returnDate != null" >
+        #{returnDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbReservationExample" resultType="java.lang.Integer" >
+    select count(*) from rb_reservation
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_reservation
+    <set >
+      <if test="record.reservationId != null" >
+        reservation_id = #{record.reservationId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bookId != null" >
+        book_id = #{record.bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null" >
+        state = #{record.state,jdbcType=INTEGER},
+      </if>
+      <if test="record.deadline != null" >
+        deadline = #{record.deadline,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.takenDate != null" >
+        taken_date = #{record.takenDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.returnDate != null" >
+        return_date = #{record.returnDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_reservation
+    set reservation_id = #{record.reservationId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      book_id = #{record.bookId,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=INTEGER},
+      deadline = #{record.deadline,jdbcType=TIMESTAMP},
+      taken_date = #{record.takenDate,jdbcType=TIMESTAMP},
+      return_date = #{record.returnDate,jdbcType=TIMESTAMP},
+      phone = #{record.phone,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbReservation" >
+    update rb_reservation
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bookId != null" >
+        book_id = #{bookId,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="deadline != null" >
+        deadline = #{deadline,jdbcType=TIMESTAMP},
+      </if>
+      <if test="takenDate != null" >
+        taken_date = #{takenDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="returnDate != null" >
+        return_date = #{returnDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where reservation_id = #{reservationId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbReservation" >
+    update rb_reservation
+    set user_id = #{userId,jdbcType=VARCHAR},
+      book_id = #{bookId,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      deadline = #{deadline,jdbcType=TIMESTAMP},
+      taken_date = #{takenDate,jdbcType=TIMESTAMP},
+      return_date = #{returnDate,jdbcType=TIMESTAMP},
+      phone = #{phone,jdbcType=VARCHAR}
+    where reservation_id = #{reservationId,jdbcType=VARCHAR}
+  </update>
+</mapper>

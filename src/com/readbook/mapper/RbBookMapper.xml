@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.readbook.mapper.RbBookMapper" >
+	<select id="getTotalCount" resultType="Integer">
+		select count(*) from rb_book;
+	</select>
+	<!-- 根据id添加图书 -->
+	<update id="addBookById">
+		update rb_book set stock =stock +1 where isbn=#{isbn}
+	</update>
+	<!-- 根据id删除图书 -->
+	<update id="deleteBookById">
+		update rb_book set stock =stock -1 where isbn=#{isbn}
+	</update>
+	<!-- 根据id查询库存 -->
+	<select id="selectStockById" resultType="string">
+		select stock from rb_book where isbn=#{isbn}
+	</select>
+	<!-- 更新库存 -->
+	<update id="updteStockInc">
+		update rb_book set stock=stock+1 where isbn=#{bookId}
+	</update>
+	<!-- 根据书id获取书名 -->
+	<select id="getBookNameById" resultType="string">
+		select name from rb_book where isbn=#{bookId}
+	</select>
+	<!-- 更新阅读量 -->
+	<update id="updateReadCntInc">
+		UPDATE rb_book SET read_cnt=read_cnt+1 WHERE isbn=#{bookId}
+	</update>
+	<!-- 检查是否有库存 -->
+	<select id="checkIsStock" resultType="string">
+		select stock from rb_book where isbn=#{bookId}
+	</select>
+	<update id="minusBookById">
+		UPDATE rb_book SET stock=stock-1 WHERE isbn=#{bookId}
+	</update>
+	<select id="getBooksByCondition" resultType="com.readbook.pojo.RbBook">
+		SELECT NAME,author,pub_house AS pubHouse,pub_date AS pubDate,isbn,book_img AS bookImg,stock,tags,description,provider,
+		read_cnt AS readCnt,comment_cnt AS commentCnt,votes,score,score_cnt AS scoreCnt,is_delete AS idDelete FROM rb_book
+		WHERE is_delete =FALSE 
+		<if test="0==1">
+			ORDER BY read_cnt DESC
+		</if>
+		limit #{1},#{2}
+	</select>
+
+
+	<select id="searchBookByKey" resultType="com.readbook.pojo.RbBook">
+		SELECT isbn,name,author,pub_house as pubHouse,
+		pub_date as pubDate,book_img as bookImg,stock,tags,provider,read_cnt as readCnt,
+		comment_cnt as commentCnt,votes,score,score_cnt as scoreCnt,is_delete isDelete,
+		description
+		 FROM rb_book WHERE CONCAT(NAME,author,pub_house) LIKE "%"#{0}"%" limit #{1},#{2};
+	</select>
+  <resultMap id="BaseResultMap" type="com.readbook.pojo.RbBook" >
+    <id column="ISBN" property="isbn" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="pub_house" property="pubHouse" jdbcType="VARCHAR" />
+    <result column="pub_date" property="pubDate" jdbcType="TIMESTAMP" />
+    <result column="book_img" property="bookImg" jdbcType="VARCHAR" />
+    <result column="stock" property="stock" jdbcType="INTEGER" />
+    <result column="tags" property="tags" jdbcType="INTEGER" />
+    <result column="provider" property="provider" jdbcType="VARCHAR" />
+    <result column="read_cnt" property="readCnt" jdbcType="INTEGER" />
+    <result column="comment_cnt" property="commentCnt" jdbcType="INTEGER" />
+    <result column="votes" property="votes" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="score_cnt" property="scoreCnt" jdbcType="INTEGER" />
+    <result column="is_delete" property="isDelete" jdbcType="BIT" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.readbook.pojo.RbBook" extends="BaseResultMap" >
+    <result column="description" property="description" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ISBN, NAME, author, pub_house, pub_date, book_img, stock, tags, provider, read_cnt, 
+    comment_cnt, votes, score, score_cnt, is_delete
+  </sql>
+  <sql id="Blob_Column_List" >
+    description
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.readbook.pojo.RbBookExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_book
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.readbook.pojo.RbBookExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rb_book
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from rb_book
+    where ISBN = #{isbn,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from rb_book
+    where ISBN = #{isbn,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.readbook.pojo.RbBookExample" >
+    delete from rb_book
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.readbook.pojo.RbBook" >
+    insert into rb_book (ISBN, NAME, author, 
+      pub_house, pub_date, book_img, 
+      stock, tags, provider, 
+      read_cnt, comment_cnt, votes, 
+      score, score_cnt, is_delete, 
+      description)
+    values (#{isbn,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR}, 
+      #{pubHouse,jdbcType=VARCHAR}, #{pubDate,jdbcType=TIMESTAMP}, #{bookImg,jdbcType=VARCHAR}, 
+      #{stock,jdbcType=INTEGER}, #{tags,jdbcType=INTEGER}, #{provider,jdbcType=VARCHAR}, 
+      #{readCnt,jdbcType=INTEGER}, #{commentCnt,jdbcType=INTEGER}, #{votes,jdbcType=INTEGER}, 
+      #{score,jdbcType=INTEGER}, #{scoreCnt,jdbcType=INTEGER}, #{isDelete,jdbcType=BIT}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.readbook.pojo.RbBook" >
+    insert into rb_book
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="isbn != null" >
+        ISBN,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="author != null" >
+        author,
+      </if>
+      <if test="pubHouse != null" >
+        pub_house,
+      </if>
+      <if test="pubDate != null" >
+        pub_date,
+      </if>
+      <if test="bookImg != null" >
+        book_img,
+      </if>
+      <if test="stock != null" >
+        stock,
+      </if>
+      <if test="tags != null" >
+        tags,
+      </if>
+      <if test="provider != null" >
+        provider,
+      </if>
+      <if test="readCnt != null" >
+        read_cnt,
+      </if>
+      <if test="commentCnt != null" >
+        comment_cnt,
+      </if>
+      <if test="votes != null" >
+        votes,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="scoreCnt != null" >
+        score_cnt,
+      </if>
+      <if test="isDelete != null" >
+        is_delete,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="isbn != null" >
+        #{isbn,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="pubDate != null" >
+        #{pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookImg != null" >
+        #{bookImg,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null" >
+        #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="tags != null" >
+        #{tags,jdbcType=INTEGER},
+      </if>
+      <if test="provider != null" >
+        #{provider,jdbcType=VARCHAR},
+      </if>
+      <if test="readCnt != null" >
+        #{readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="commentCnt != null" >
+        #{commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="votes != null" >
+        #{votes,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="scoreCnt != null" >
+        #{scoreCnt,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.readbook.pojo.RbBookExample" resultType="java.lang.Integer" >
+    select count(*) from rb_book
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update rb_book
+    <set >
+      <if test="record.isbn != null" >
+        ISBN = #{record.isbn,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        NAME = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.author != null" >
+        author = #{record.author,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pubHouse != null" >
+        pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pubDate != null" >
+        pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.bookImg != null" >
+        book_img = #{record.bookImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stock != null" >
+        stock = #{record.stock,jdbcType=INTEGER},
+      </if>
+      <if test="record.tags != null" >
+        tags = #{record.tags,jdbcType=INTEGER},
+      </if>
+      <if test="record.provider != null" >
+        provider = #{record.provider,jdbcType=VARCHAR},
+      </if>
+      <if test="record.readCnt != null" >
+        read_cnt = #{record.readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.commentCnt != null" >
+        comment_cnt = #{record.commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.votes != null" >
+        votes = #{record.votes,jdbcType=INTEGER},
+      </if>
+      <if test="record.score != null" >
+        score = #{record.score,jdbcType=INTEGER},
+      </if>
+      <if test="record.scoreCnt != null" >
+        score_cnt = #{record.scoreCnt,jdbcType=INTEGER},
+      </if>
+      <if test="record.isDelete != null" >
+        is_delete = #{record.isDelete,jdbcType=BIT},
+      </if>
+      <if test="record.description != null" >
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update rb_book
+    set ISBN = #{record.isbn,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      author = #{record.author,jdbcType=VARCHAR},
+      pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      book_img = #{record.bookImg,jdbcType=VARCHAR},
+      stock = #{record.stock,jdbcType=INTEGER},
+      tags = #{record.tags,jdbcType=INTEGER},
+      provider = #{record.provider,jdbcType=VARCHAR},
+      read_cnt = #{record.readCnt,jdbcType=INTEGER},
+      comment_cnt = #{record.commentCnt,jdbcType=INTEGER},
+      votes = #{record.votes,jdbcType=INTEGER},
+      score = #{record.score,jdbcType=INTEGER},
+      score_cnt = #{record.scoreCnt,jdbcType=INTEGER},
+      is_delete = #{record.isDelete,jdbcType=BIT},
+      description = #{record.description,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update rb_book
+    set ISBN = #{record.isbn,jdbcType=VARCHAR},
+      NAME = #{record.name,jdbcType=VARCHAR},
+      author = #{record.author,jdbcType=VARCHAR},
+      pub_house = #{record.pubHouse,jdbcType=VARCHAR},
+      pub_date = #{record.pubDate,jdbcType=TIMESTAMP},
+      book_img = #{record.bookImg,jdbcType=VARCHAR},
+      stock = #{record.stock,jdbcType=INTEGER},
+      tags = #{record.tags,jdbcType=INTEGER},
+      provider = #{record.provider,jdbcType=VARCHAR},
+      read_cnt = #{record.readCnt,jdbcType=INTEGER},
+      comment_cnt = #{record.commentCnt,jdbcType=INTEGER},
+      votes = #{record.votes,jdbcType=INTEGER},
+      score = #{record.score,jdbcType=INTEGER},
+      score_cnt = #{record.scoreCnt,jdbcType=INTEGER},
+      is_delete = #{record.isDelete,jdbcType=BIT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.readbook.pojo.RbBook" >
+    update rb_book
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="pubHouse != null" >
+        pub_house = #{pubHouse,jdbcType=VARCHAR},
+      </if>
+      <if test="pubDate != null" >
+        pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bookImg != null" >
+        book_img = #{bookImg,jdbcType=VARCHAR},
+      </if>
+      <if test="stock != null" >
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+      <if test="tags != null" >
+        tags = #{tags,jdbcType=INTEGER},
+      </if>
+      <if test="provider != null" >
+        provider = #{provider,jdbcType=VARCHAR},
+      </if>
+      <if test="readCnt != null" >
+        read_cnt = #{readCnt,jdbcType=INTEGER},
+      </if>
+      <if test="commentCnt != null" >
+        comment_cnt = #{commentCnt,jdbcType=INTEGER},
+      </if>
+      <if test="votes != null" >
+        votes = #{votes,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="scoreCnt != null" >
+        score_cnt = #{scoreCnt,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null" >
+        is_delete = #{isDelete,jdbcType=BIT},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where ISBN = #{isbn,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.readbook.pojo.RbBook" >
+    update rb_book
+    set NAME = #{name,jdbcType=VARCHAR},
+      author = #{author,jdbcType=VARCHAR},
+      pub_house = #{pubHouse,jdbcType=VARCHAR},
+      pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      book_img = #{bookImg,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      tags = #{tags,jdbcType=INTEGER},
+      provider = #{provider,jdbcType=VARCHAR},
+      read_cnt = #{readCnt,jdbcType=INTEGER},
+      comment_cnt = #{commentCnt,jdbcType=INTEGER},
+      votes = #{votes,jdbcType=INTEGER},
+      score = #{score,jdbcType=INTEGER},
+      score_cnt = #{scoreCnt,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=BIT},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where ISBN = #{isbn,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.readbook.pojo.RbBook" >
+    update rb_book
+    set NAME = #{name,jdbcType=VARCHAR},
+      author = #{author,jdbcType=VARCHAR},
+      pub_house = #{pubHouse,jdbcType=VARCHAR},
+      pub_date = #{pubDate,jdbcType=TIMESTAMP},
+      book_img = #{bookImg,jdbcType=VARCHAR},
+      stock = #{stock,jdbcType=INTEGER},
+      tags = #{tags,jdbcType=INTEGER},
+      provider = #{provider,jdbcType=VARCHAR},
+      read_cnt = #{readCnt,jdbcType=INTEGER},
+      comment_cnt = #{commentCnt,jdbcType=INTEGER},
+      votes = #{votes,jdbcType=INTEGER},
+      score = #{score,jdbcType=INTEGER},
+      score_cnt = #{scoreCnt,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=BIT}
+    where ISBN = #{isbn,jdbcType=VARCHAR}
+  </update>
+</mapper>
